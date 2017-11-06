@@ -35,7 +35,7 @@ public class FileReader {
         Map<String, Integer> data = new HashMap<>();
         temp.forEach(type -> data.put(type, 0));
         this.ASList.forEach(as -> data.put(as.getType(), data.get(as.getType()) + 1));
-        List<String> outputLine = data.entrySet().stream().map(set -> set.getKey() + " " + set.getValue().toString() + "\n").collect(Collectors.toList());
+        List<String> outputLine = data.entrySet().stream().map(set -> set.getKey() + "," + set.getValue().toString() + "\n").collect(Collectors.toList());
         try {
             PrintWriter printWriter = new PrintWriter(new FileWriter(fileName));
             outputLine.forEach(printWriter::print);
@@ -107,12 +107,24 @@ public class FileReader {
                     System.out.println("Other not found: " + line[2]);
                 }
             }
-            for (AS as : this.getASList()) {
-                as.PrintAS();
-            }
+            Collections.sort(this.ASList);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void writeNodeDegree(String fileName) {
+        List<String> outputLine = this.ASList.stream()
+                .filter(as -> (as.getCustomers().size() + as.getPeers().size()) > 0)
+                .map(as -> as.getASIdentifier() + "," + (as.getCustomers().size() + as.getPeers().size()))
+                .collect(Collectors.toList());
+        try {
+            PrintWriter printWriter = new PrintWriter(new FileWriter(fileName));
+            outputLine.forEach(printWriter::println);
+            printWriter.close();
+        } catch (IOException e) {
+            System.out.println("Error writing to file");
+            e.printStackTrace();
+        }
+    }
 }

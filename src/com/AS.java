@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AS
+public class AS implements Comparable<AS>
 {
     private String ASIdentifier;
     private String Source;
@@ -109,5 +109,10 @@ public class AS
 
     public void setCustomers(ArrayList<AS> customers) {
         this.customers = customers;
+    }
+
+    @Override
+    public int compareTo(AS o) {
+        return Integer.compare(Integer.parseInt(this.ASIdentifier), Integer.parseInt(o.getASIdentifier()));
     }
 }
