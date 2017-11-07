@@ -45,6 +45,37 @@ public class FileReader {
             e.printStackTrace();
         }
     }
+    
+    public void MakeTypePieChart(String fileName) {
+    	int numEnterprise = 0;
+    	int numContent = 0;
+    	int numTransit = 0;
+    	
+    	for (AS as : this.ASList) {
+    		if(as.getCustomers().size() == 0 && as.getPeers().size() > 0) {
+    			numContent++;
+    		}
+    		if(as.getCustomers().size() > 0) {
+    			numTransit++;
+    		}
+    		if((as.getCustomers().size() + as.getPeers().size()) < 2) {
+    			numEnterprise++; // THIS DOESN'T MAKE SENSE
+    		}
+    	}
+    	
+    	try {
+            PrintWriter printWriter = new PrintWriter(new FileWriter(fileName));
+            printWriter.println("Content," + numContent);
+            printWriter.println("Enterprise," + numEnterprise);
+            printWriter.println("Transit," + numTransit);
+            printWriter.close();
+    	} catch (IOException e) {
+            System.out.println("Error writing to file");
+            e.printStackTrace();
+        }
+    	
+    	
+    }
 
     public void clear() {
         this.ASList = Collections.emptyList();
