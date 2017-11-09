@@ -3,6 +3,7 @@ package com;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -58,8 +59,8 @@ public class FileReader {
     		if(as.getCustomers().size() > 0) {
     			numTransit++;
     		}
-    		if((as.getCustomers().size() + as.getPeers().size()) < 2) {
-    			numEnterprise++; // THIS DOESN'T MAKE SENSE
+    		if((as.getProviders().size()) < 2 && as.getCustomers().size() == 0 && as.getPeers().size() == 0) {
+    			numEnterprise++;
     		}
     	}
     	
@@ -146,8 +147,50 @@ public class FileReader {
 
     public void writeNodeDegree(String fileName) {
         List<String> outputLine = this.ASList.stream()
-                .filter(as -> (as.getCustomers().size() + as.getPeers().size()) > 0)
-                .map(as -> as.getASIdentifier() + "," + (as.getCustomers().size() + as.getPeers().size()))
+                .filter(as -> (as.getCustomers().size() + as.getPeers().size() + as.getProviders().size()) > 0)
+                .map(as -> as.getASIdentifier() + "," + (as.getCustomers().size() + as.getPeers().size() + as.getProviders().size()))
+                .collect(Collectors.toList());
+        try {
+            PrintWriter printWriter = new PrintWriter(new FileWriter(fileName));
+            outputLine.forEach(printWriter::println);
+            printWriter.close();
+        } catch (IOException e) {
+            System.out.println("Error writing to file");
+            e.printStackTrace();
+        }
+    }
+
+    public void AddIPInformation(String fileName) {
+        try {
+            final List<String> inputData = Files.lines(Paths.get(fileName)).collect(Collectors.toList());
+
+            // Make a map that relates the identifier ot the object
+            Map<String, AS> asMap = new HashMap<>();
+            this.ASList.forEach(as -> asMap.put(as.getASIdentifier(), as));
+
+            for (String line : inputData){
+                String[] split = line.split("\\s+");
+                if (asMap.containsKey(split[2]) && !split[2].contains("_")){
+                    // System.out.println(split[2]);
+                    asMap.get(split[2]).addIP(split[0]);
+                    asMap.get(split[2]).addToNetworkSize(Integer.parseInt(split[1]));
+                    asMap.get(split[2]).addNetworkLength(Integer.parseInt(split[1]));
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void MakeHistogram(String fileName) {
+        final List<BigInteger> bigIntegers = this.getASList().stream()
+                .map(as -> as.getNetworkSize())
+                .collect(Collectors.toList());
+        Collections.sort(bigIntegers);
+        final List<String> outputLine = bigIntegers.stream()
+                .map(BigInteger::toString)
                 .collect(Collectors.toList());
         try {
             PrintWriter printWriter = new PrintWriter(new FileWriter(fileName));

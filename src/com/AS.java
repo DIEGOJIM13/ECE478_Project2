@@ -1,6 +1,7 @@
 package com;
 
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,9 +11,12 @@ public class AS implements Comparable<AS>
     private String ASIdentifier;
     private String Source;
     private String Type;
+    private ArrayList<String> ip;
+    private ArrayList<Integer> networkLength;
     private ArrayList<AS> peers;
     private ArrayList<AS> customers;
     private ArrayList<AS> providers;
+    private BigInteger networkSize;
 
     public AS(String ASIdentifier){
         this.ASIdentifier = ASIdentifier;
@@ -21,6 +25,9 @@ public class AS implements Comparable<AS>
         this.peers = new ArrayList<>();
         this.customers = new ArrayList<>();
         this.providers = new ArrayList<>();
+        this.ip = new ArrayList<>();
+        this.networkLength = new ArrayList<>();
+        networkSize = BigInteger.valueOf(0);
 //        PrintAS();
     }
 
@@ -31,6 +38,9 @@ public class AS implements Comparable<AS>
         this.peers = new ArrayList<>();
         this.customers = new ArrayList<>();
         this.providers = new ArrayList<>();
+        this.ip = new ArrayList<>();
+        this.networkLength = new ArrayList<>();
+        networkSize = BigInteger.valueOf(0);
 //        PrintAS();
     }
 
@@ -49,25 +59,34 @@ public class AS implements Comparable<AS>
     public void PrintAS(){
         System.out.println("AS with:");
         if (this.ASIdentifier != null){
-            System.out.println("\tIdentifier:\t" + this.ASIdentifier);
+            System.out.println("\tIdentifier:\t\t" + this.ASIdentifier);
         }
         if (this.Source != null){
-            System.out.println("\tSource:\t\t" + this.Source);
+            System.out.println("\tSource:\t\t\t" + this.Source);
         }
         if (this.Type != null){
-            System.out.println("\tType:\t\t" + this.Type);
+            System.out.println("\tType:\t\t\t" + this.Type);
         }
         if (this.peers.size() > 0){
-            System.out.println("\tPeers:\t\t" + peers.size());
+            System.out.println("\tPeers:\t\t\t" + peers.size());
         }
         if (this.customers.size() > 0){
-            System.out.println("\tCustomers:\t" + customers.size());
+            System.out.println("\tCustomers:\t\t" + customers.size());
         }
         if (this.providers.size() > 0){
-            System.out.println("\tProviders:\t" + providers.size());
+            System.out.println("\tProviders:\t\t" + providers.size());
         }
         if (this.peers.size() > 0 || this.customers.size() > 0 || this.providers.size() > 0){
-            System.out.println("\tDegree:\t\t" + (providers.size() + customers.size() + peers.size()));
+            System.out.println("\tDegree:\t\t\t" + (providers.size() + customers.size() + peers.size()));
+        }
+        if (this.ip.size() != 0){
+            System.out.println("\tIP:\t\t\t\t" + this.ip);
+        }
+        if (this.networkLength.size() != 0){
+            System.out.println("\tNetwork Length:\t" + this.networkLength);
+        }
+        if (this.networkSize.intValue() != 0){
+            System.out.println("\tNetwork Size:\t" + this.networkSize);
         }
     }
 
@@ -107,6 +126,10 @@ public class AS implements Comparable<AS>
         return customers;
     }
 
+    public ArrayList<AS> getProviders() {
+        return providers;
+    }
+
     public void setCustomers(ArrayList<AS> customers) {
         this.customers = customers;
     }
@@ -114,5 +137,46 @@ public class AS implements Comparable<AS>
     @Override
     public int compareTo(AS o) {
         return Integer.compare(Integer.parseInt(this.ASIdentifier), Integer.parseInt(o.getASIdentifier()));
+    }
+
+    public ArrayList<String> getIp() {
+        return ip;
+    }
+
+    public void setIp(ArrayList<String> ip) {
+        this.ip = ip;
+    }
+
+    public ArrayList<Integer> getNetworkLength() {
+        return networkLength;
+    }
+
+    public void setNetworkLength(ArrayList<Integer> networkLength) {
+        this.networkLength = networkLength;
+    }
+
+    public void addIP(String ip) {
+        this.ip.add(ip);
+    }
+
+    public void addNetworkLength(int networkLength){
+        this.networkLength.add(networkLength);
+    }
+
+    public BigInteger getNetworkSize() {
+        return networkSize;
+    }
+
+    public void setNetworkSize(BigInteger networkSize) {
+        this.networkSize = networkSize;
+    }
+
+    public void addToNetworkSize(int i) {
+        BigInteger a = BigInteger.valueOf(2).pow(32);
+        this.networkSize = this.networkSize.add(BigInteger.valueOf(2).pow(32-i));
+        if (this.networkSize.compareTo(BigInteger.valueOf(2).pow(32)) > 0){
+            System.out.println(this.networkSize);
+
+        }
     }
 }

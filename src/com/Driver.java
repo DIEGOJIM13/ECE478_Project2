@@ -1,5 +1,10 @@
 package com;
 
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Driver {
 
     public static void main(String[] args) {
@@ -13,10 +18,10 @@ public class Driver {
         String topologyFile = "20170901.as-rel2.txt";
         reader.readTopologyFile(topologyFile);
         reader.writeNodeDegree("part2.csv");
-//      reader.getASList().forEach(a -> System.out.println(a.getASIdentifier() + " "));
-        
+
         // Create the pie graph for part 2
-        //reader.clear();
+        reader.AddIPInformation("routeviews-rv2-20171105-1200.pfx2as");
+        reader.MakeHistogram("part3.csv");
         reader.MakeTypePieChart("part4.csv");
         
         
