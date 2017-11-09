@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -139,7 +140,7 @@ public class FileReader {
                     System.out.println("Other not found: " + line[2]);
                 }
             }
-            Collections.sort(this.ASList);
+            Collections.sort(this.ASList, AS.ASIdentifierCompare);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -192,6 +193,38 @@ public class FileReader {
         final List<String> outputLine = bigIntegers.stream()
                 .map(BigInteger::toString)
                 .collect(Collectors.toList());
+        try {
+            PrintWriter printWriter = new PrintWriter(new FileWriter(fileName));
+            outputLine.forEach(printWriter::println);
+            printWriter.close();
+        } catch (IOException e) {
+            System.out.println("Error writing to file");
+            e.printStackTrace();
+        }
+    }
+
+    public void MakeCliqueTable(String fileName) {
+        Collections.sort(this.ASList, AS.DegreeCompare);
+        // Find clique
+        ArrayList<AS> clique = new ArrayList<>();
+        clique.add(this.ASList.get(0));
+        this.ASList.remove(0);
+        while (true){
+            final AS next = this.ASList.get(0);
+            final List<AS> notIncluded = clique.stream().filter(as -> !as.ConnectedTo(next)).collect(Collectors.toList());
+            if (notIncluded.size() != 0){
+                break;
+            }
+            else{
+                clique.add(next);
+                this.ASList.remove(0);
+            }
+        }
+        final List<String> outputLine = clique.stream()
+                .map(as -> as.getASIdentifier() + ","
+                        + (as.getPeers().size() + as.getCustomers().size() + as.getProviders().size()))
+                .collect(Collectors.toList());
+
         try {
             PrintWriter printWriter = new PrintWriter(new FileWriter(fileName));
             outputLine.forEach(printWriter::println);

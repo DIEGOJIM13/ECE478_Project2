@@ -14,18 +14,23 @@ public class Driver {
         reader.MakePieChartFile("part1.csv");
         
         reader.clear();
-        // Read 20170901.as-rel2.txt for part 2
+        // Read 20170901.as-rel2.txt and routeviews-rv2-20171105-1200.pfx2as for part 2
         String topologyFile = "20170901.as-rel2.txt";
         reader.readTopologyFile(topologyFile);
+        // Write the degree of each AS
         reader.writeNodeDegree("part2.csv");
-
         // Create the pie graph for part 2
         reader.AddIPInformation("routeviews-rv2-20171105-1200.pfx2as");
+        // Make histogram based on IP information
         reader.MakeHistogram("part3.csv");
+        // Make pie chart to classify AS
         reader.MakeTypePieChart("part4.csv");
         
-        
+        // Find max clique for part 3
+        reader.MakeCliqueTable("part5.csv");
 
     }
+
+
 
 }

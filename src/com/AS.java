@@ -3,10 +3,9 @@ package com;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Comparator;
 
-public class AS implements Comparable<AS>
+public class AS
 {
     private String ASIdentifier;
     private String Source;
@@ -134,11 +133,6 @@ public class AS implements Comparable<AS>
         this.customers = customers;
     }
 
-    @Override
-    public int compareTo(AS o) {
-        return Integer.compare(Integer.parseInt(this.ASIdentifier), Integer.parseInt(o.getASIdentifier()));
-    }
-
     public ArrayList<String> getIp() {
         return ip;
     }
@@ -177,6 +171,36 @@ public class AS implements Comparable<AS>
         if (this.networkSize.compareTo(BigInteger.valueOf(2).pow(32)) > 0){
             System.out.println(this.networkSize);
 
+        }
+    }
+
+    public static Comparator<AS> ASIdentifierCompare = new Comparator<AS>() {
+
+        public int compare(AS as1, AS as2) {
+            return Integer.compare(Integer.parseInt(as1.ASIdentifier), Integer.parseInt(as2.getASIdentifier()));
+        }
+    };
+
+    public static Comparator<AS> DegreeCompare = new Comparator<AS>() {
+
+        public int compare(AS as1, AS as2) {
+            return Integer.compare(as2.peers.size() + as2.customers.size() + as2.providers.size(),
+                    as1.peers.size() + as1.customers.size() + as1.providers.size());
+        }
+    };
+
+    public boolean ConnectedTo(AS next) {
+        if (this.peers.contains(next)){
+            return true;
+        }
+        else if (this.customers.contains(next)){
+            return true;
+        }
+        else if (this.providers.contains(next)){
+            return true;
+        }
+        else{
+            return false;
         }
     }
 }
