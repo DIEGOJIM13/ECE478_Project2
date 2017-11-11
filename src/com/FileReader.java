@@ -6,8 +6,14 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collector;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,14 +61,17 @@ public class FileReader {
     	
     	for (AS as : this.ASList) {
     		if(as.getCustomers().size() == 0 && as.getPeers().size() > 0) {
+    		    as.setType("Content");
     			numContent++;
     		}
     		if(as.getCustomers().size() > 0) {
     			numTransit++;
-    		}
+                as.setType("Transit");
+            }
     		if((as.getProviders().size()) < 2 && as.getCustomers().size() == 0 && as.getPeers().size() == 0) {
     			numEnterprise++;
-    		}
+                as.setType("Enterprise");
+            }
     	}
     	
     	try {
@@ -204,7 +213,7 @@ public class FileReader {
     }
 
     public void MakeCliqueTable(String fileName) {
-        Collections.sort(this.ASList, AS.DegreeCompare);
+        this.ASList.sort(AS.DegreeCompare);
         // Find clique
         ArrayList<AS> clique = new ArrayList<>();
         clique.add(this.ASList.get(0));
@@ -234,4 +243,81 @@ public class FileReader {
             e.printStackTrace();
         }
     }
+
+    public void CreateCustomerCone(String fileName1, String fileName2) {
+        for (AS as : this.ASList) {
+            final Set<AS> asSet = customerAS(as);
+            ArrayList<AS> asArrayList = new ArrayList<>(asSet);
+            as.setInCustomerCone(asArrayList);
+            asArrayList.sort(AS.ASIdentifierCompare);
+        }
+        ArrayList<TableData> tableData = new ArrayList<>();
+        BigInteger totalASes = BigInteger.valueOf(this.ASList.size());
+        BigInteger totalIPPrefix = BigInteger.ZERO;
+        for (AS as : this.ASList){
+            totalIPPrefix = totalIPPrefix.add(BigInteger.valueOf(as.getIp().size()));
+        }
+        BigInteger totalIPs = BigInteger.valueOf(2).pow(32);
+        for (AS as : this.ASList) {
+            int asNumber = Integer.parseInt(as.getASIdentifier());
+            String asName = as.getType();
+            int asDegree = as.getCustomers().size() + as.getPeers().size() + as.getProviders().size();
+            BigInteger numASes = BigInteger.valueOf(as.getInCustomerCone().size());
+            BigInteger numIPPrefix = BigInteger.ZERO;
+            for (AS as1 : as.getInCustomerCone()){
+                numIPPrefix = numIPPrefix.add(BigInteger.valueOf(as1.getIp().size()));
+            }
+            BigInteger numIPs = BigInteger.ZERO;
+            for (AS as1 : as.getInCustomerCone()){
+                numIPs = numIPs.add(as1.getNetworkSize());
+            }
+            double percentASes = 100 * numASes.doubleValue() / totalASes.doubleValue();
+            double percentIPPrefix = 100 * numIPPrefix.doubleValue() / totalIPPrefix.doubleValue();
+            double percentIPs = 100 * numIPs.doubleValue() / totalIPs.doubleValue();
+            tableData.add(new TableData(asNumber, asName, asDegree, numASes, numIPPrefix, numIPs, percentASes, percentIPPrefix, percentIPs));
+        }
+
+        tableData.sort(TableData.CompareNumASes);
+        try {
+            PrintWriter printWriter = new PrintWriter(new FileWriter(fileName1));
+            printWriter.println(TableData.StringHeaderInfo());
+            for (int i = 0; i < 15; i++){
+                printWriter.println(tableData.get(i).StringTableData());
+            }
+            printWriter.close();
+        } catch (IOException e) {
+            System.out.println("Error writing to file");
+            e.printStackTrace();
+        }
+
+        tableData.sort(TableData.ComparePercentageIPs);
+        try {
+            PrintWriter printWriter = new PrintWriter(new FileWriter(fileName2));
+            printWriter.println(TableData.StringHeaderInfo());
+            for (int i = 0; i < 15; i++){
+                printWriter.println(tableData.get(i).StringTableData());
+            }
+            printWriter.close();
+        } catch (IOException e) {
+            System.out.println("Error writing to file");
+            e.printStackTrace();
+        }
+    }
+
+    public Set<AS> customerAS(AS as){
+        Set<AS> asSet = new HashSet<>();
+        asSet.add(as);
+        if (as.getCustomers().size() == 0){
+            asSet.add(as);
+            return asSet;
+        }
+        else{
+            for (AS individualAS : as.getCustomers()){
+                Set<AS> as1 = customerAS(individualAS);
+                asSet.addAll(as1);
+            }
+            return asSet;
+        }
+    }
+
 }

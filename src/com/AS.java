@@ -1,6 +1,5 @@
 package com;
 
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,6 +15,7 @@ public class AS
     private ArrayList<AS> customers;
     private ArrayList<AS> providers;
     private BigInteger networkSize;
+    private ArrayList<AS> inCustomerCone;
 
     public AS(String ASIdentifier){
         this.ASIdentifier = ASIdentifier;
@@ -26,6 +26,7 @@ public class AS
         this.providers = new ArrayList<>();
         this.ip = new ArrayList<>();
         this.networkLength = new ArrayList<>();
+        this.inCustomerCone = new ArrayList<>();
         networkSize = BigInteger.valueOf(0);
 //        PrintAS();
     }
@@ -39,6 +40,7 @@ public class AS
         this.providers = new ArrayList<>();
         this.ip = new ArrayList<>();
         this.networkLength = new ArrayList<>();
+        this.inCustomerCone = new ArrayList<>();
         networkSize = BigInteger.valueOf(0);
 //        PrintAS();
     }
@@ -202,5 +204,13 @@ public class AS
         else{
             return false;
         }
+    }
+
+    public ArrayList<AS> getInCustomerCone() {
+        return inCustomerCone;
+    }
+
+    public void setInCustomerCone(ArrayList<AS> inCustomerCone) {
+        this.inCustomerCone = inCustomerCone;
     }
 }
