@@ -16,11 +16,13 @@ public class AS
     private ArrayList<AS> providers;
     private BigInteger networkSize;
     private ArrayList<AS> inCustomerCone;
+    private String organization;
 
     public AS(String ASIdentifier){
         this.ASIdentifier = ASIdentifier;
         this.Source = null;
         this.Type = null;
+        this.organization = null;
         this.peers = new ArrayList<>();
         this.customers = new ArrayList<>();
         this.providers = new ArrayList<>();
@@ -35,6 +37,7 @@ public class AS
         this.ASIdentifier = ASIdentifier;
         this.Source = Source;
         this.Type = Type;
+        this.organization = null;
         this.peers = new ArrayList<>();
         this.customers = new ArrayList<>();
         this.providers = new ArrayList<>();
@@ -145,6 +148,14 @@ public class AS
 
     public ArrayList<Integer> getNetworkLength() {
         return networkLength;
+    }
+    
+    public void setOrganization(String organization) {
+    	this.organization = organization;
+    }
+    
+    public String getOrganization() {
+    	return this.organization;
     }
 
     public void setNetworkLength(ArrayList<Integer> networkLength) {

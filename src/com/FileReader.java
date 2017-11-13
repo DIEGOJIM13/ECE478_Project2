@@ -229,9 +229,11 @@ public class FileReader {
                 this.ASList.remove(0);
             }
         }
+        getOrganizationMapping(clique, "20091001.as-org2info.txt");
         final List<String> outputLine = clique.stream()
                 .map(as -> as.getASIdentifier() + ","
-                        + (as.getPeers().size() + as.getCustomers().size() + as.getProviders().size()))
+                        + (as.getPeers().size() + as.getCustomers().size() + as.getProviders().size()) + ","
+                		+ (as.getOrganization()))
                 .collect(Collectors.toList());
 
         try {
@@ -317,6 +319,39 @@ public class FileReader {
                 asSet.addAll(as1);
             }
             return asSet;
+        }
+    }
+    
+    public void getOrganizationMapping(List<AS> ASList, String fileName) {
+    	List<String> orgNames = null;
+    	List<String> ASIds = null;
+    	try {
+            Stream<String> stream = Files.lines(Paths.get(fileName));
+            orgNames = stream
+                    .filter(l -> l.charAt(0) != '#')
+                    .filter(l -> l.split("\\|").length == 5)
+                    .map(l -> new String(l.split("\\|")[2]))
+                    .collect(Collectors.toList());
+            
+            Stream<String> stream2 = Files.lines(Paths.get(fileName));
+            
+            ASIds = stream2
+                    .filter(l -> l.charAt(0) != '#')
+                    .filter(l -> l.split("\\|").length == 5)
+                    .map(l -> new String(l.split("\\|")[0]))
+                    .collect(Collectors.toList());
+            
+            for(int i = 0; i < orgNames.size(); i++) {
+            	for (int j = 0; j < ASList.size(); j++) {
+                	if(ASIds.get(i).equals(ASList.get(j).getASIdentifier())) {
+                		ASList.get(j).setOrganization(orgNames.get(i));
+                	}
+                }
+            }
+            
+        } catch (IOException e) {
+            System.out.println("Exception Happened");
+            e.printStackTrace();
         }
     }
 
