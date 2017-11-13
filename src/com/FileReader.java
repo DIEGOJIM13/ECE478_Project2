@@ -198,17 +198,59 @@ public class FileReader {
         final List<BigInteger> bigIntegers = this.getASList().stream()
                 .map(as -> as.getNetworkSize())
                 .collect(Collectors.toList());
+        int a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0;
+        for (BigInteger bi : bigIntegers){
+            if (bi.compareTo(BigInteger.valueOf(0)) >= 0  && bi.compareTo(BigInteger.valueOf(2).pow(8)) < 0){
+                a++;
+            }
+            else if (bi.compareTo(BigInteger.valueOf(2).pow(8)) >= 0  && bi.compareTo(BigInteger.valueOf(2).pow(9)) < 0){
+                b++;
+            }
+            else if (bi.compareTo(BigInteger.valueOf(2).pow(9)) >= 0  && bi.compareTo(BigInteger.valueOf(2).pow(10)) < 0){
+                c++;
+            }
+            else if (bi.compareTo(BigInteger.valueOf(2).pow(10)) >= 0  && bi.compareTo(BigInteger.valueOf(2).pow(12)) < 0){
+                d++;
+            }
+            else if (bi.compareTo(BigInteger.valueOf(2).pow(12)) >= 0  && bi.compareTo(BigInteger.valueOf(2).pow(14)) < 0){
+                e++;
+            }
+            else if (bi.compareTo(BigInteger.valueOf(2).pow(14)) >= 0  && bi.compareTo(BigInteger.valueOf(2).pow(16)) < 0){
+                f++;
+            }
+            else if (bi.compareTo(BigInteger.valueOf(2).pow(16)) >= 0  && bi.compareTo(BigInteger.valueOf(2).pow(32)) < 0){
+                g++;
+            }
+            else{
+                System.out.println("Shouldnt be here? " + bi);
+            }
+
+        }
+        System.out.println("Between 0 and 2^8:\t\t" + a);
+        System.out.println("Between 2^8 and 2^9:\t" + b);
+        System.out.println("Between 2^9 and 2^10:\t" + c);
+        System.out.println("Between 2^10 and 2^12:\t" + d);
+        System.out.println("Between 2^12 and 2^14:\t" + e);
+        System.out.println("Between 2^14 and 2^16:\t" + f);
+        System.out.println("Between 2^16 and 2^32:\t" + g);
+        System.out.println("Total " + (a + b + c + d + e + f + g));
         Collections.sort(bigIntegers);
         final List<String> outputLine = bigIntegers.stream()
                 .map(BigInteger::toString)
                 .collect(Collectors.toList());
         try {
             PrintWriter printWriter = new PrintWriter(new FileWriter(fileName));
-            outputLine.forEach(printWriter::println);
+            printWriter.println(a);
+            printWriter.println(b);
+            printWriter.println(c);
+            printWriter.println(d);
+            printWriter.println(e);
+            printWriter.println(f);
+            printWriter.println(g);
             printWriter.close();
-        } catch (IOException e) {
+        } catch (IOException ex) {
             System.out.println("Error writing to file");
-            e.printStackTrace();
+            ex.printStackTrace();
         }
     }
 
@@ -229,7 +271,7 @@ public class FileReader {
                 this.ASList.remove(0);
             }
         }
-        getOrganizationMapping(clique, "20091001.as-org2info.txt");
+        getOrganizationMapping(clique, "20170401.as-org2info.txt");
         final List<String> outputLine = clique.stream()
                 .map(as -> as.getASIdentifier() + ","
                         + (as.getPeers().size() + as.getCustomers().size() + as.getProviders().size()) + ","
@@ -247,6 +289,11 @@ public class FileReader {
     }
 
     public void CreateCustomerCone(String fileName1, String fileName2) {
+        BigInteger totalIPs = BigInteger.valueOf(0);
+        for (AS as : this.ASList){
+            totalIPs = totalIPs.add(as.getNetworkSize());
+        }
+
         for (AS as : this.ASList) {
             final Set<AS> asSet = customerAS(as);
             ArrayList<AS> asArrayList = new ArrayList<>(asSet);
@@ -259,7 +306,6 @@ public class FileReader {
         for (AS as : this.ASList){
             totalIPPrefix = totalIPPrefix.add(BigInteger.valueOf(as.getIp().size()));
         }
-        BigInteger totalIPs = BigInteger.valueOf(2).pow(32);
         for (AS as : this.ASList) {
             int asNumber = Integer.parseInt(as.getASIdentifier());
             String asName = as.getType();

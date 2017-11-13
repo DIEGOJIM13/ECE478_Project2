@@ -31,7 +31,7 @@ public class Driver {
         reader.MakeCliqueTable("part5.csv");
         System.out.println("Done with part 3");
 
-        reader.CreateCustomerCone("part6.csv", "part7.csv");
+        // reader.CreateCustomerCone("part6.csv", "part7.csv");
         System.out.println("Done with extra credit");
 
         double l2 = System.nanoTime() / 1000.0 / 1000.0 / 1000.0;
